@@ -1,7 +1,7 @@
-public class Tuple<X, Y> { 
-  public  X r; 
-  public  Y c; 
-  public Tuple(X r, Y c) { 
+public class Position { 
+  public  int r; 
+  public  int c; 
+  public Position(int r, int c) { 
     this.r = r; 
     this.c = c; 
   } 
@@ -13,8 +13,8 @@ public class Tuple<X, Y> {
   public boolean equals(Object obj) {
    if(this==obj)
     return true;
-   Tuple p=(Tuple)obj;
-   return (p.r == this.r && p.c == this.c);
+   Position p = (Position)obj;
+   return ((p.r == this.r) && (p.c == this.c));
   }
   
   public int hashCode(){
