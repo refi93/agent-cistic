@@ -1,10 +1,16 @@
 import java.util.ArrayDeque;
+
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
+import java.util.*;
+
+import javax.swing.text.html.HTMLDocument.Iterator;
 
 public  class MyAgent extends Agent{	
 	int[][] net;
@@ -16,15 +22,25 @@ public  class MyAgent extends Agent{
 		
 	public MyAgent(int height, int width) {
 		firstInit = true;
-		dest = new Position(20,17);
+		dest = new Position(10,7);
 		actionStack = new ArrayDeque<String>();
 	}
 	
 	
-	private AgentState BFS(int[][] arr, AgentState initState, Position destination){
+	public static Comparator<AgentState> agentStateComparator = new Comparator<AgentState>(){
+		
+		@Override
+		public int compare(AgentState s0, AgentState s1) {
+			// TODO Auto-generated method stub
+			return (int) (s0.compVal() - s1.compVal());
+		}
+    };
+	
+	
+	private AgentState Astar(int[][] arr, AgentState initState, Position destination){
 		if (arr[initState.pos.r][initState.pos.c] == 2) return null;
 		
-		Queue open = new LinkedList<AgentState>();
+		Queue open = new PriorityQueue<AgentState>(1000, agentStateComparator);
 		open.add(initState); // states to visit
 		
 		Set<AgentState> close = new HashSet<AgentState >(); // visited states
@@ -42,7 +58,20 @@ public  class MyAgent extends Agent{
 				while(it.hasNext()){
 					AgentState pom = it.next();
 					if ((pom != null) && (!close.contains(pom))){
-						open.add(pom);
+						if (!open.contains(pom)){
+							open.add(pom);
+						}
+						else{
+							java.util.Iterator pqit = open.iterator(); 
+							while(pqit.hasNext()){
+								AgentState openElem = (AgentState)pqit.next();
+								if (openElem.equals(pom)){
+									openElem.prevAction = pom.prevAction;
+									openElem.prevState = pom.prevState;
+									openElem.dist = pom.dist;
+								}
+							}
+						}
 					}
 				}
 			}
@@ -57,7 +86,7 @@ public  class MyAgent extends Agent{
 		if (firstInit){
 			net = percept();	// aktualny percept
 						// zadefinovane su konstanty CLEAN=0, DIRTY=1, WALL=2)	
-			goal = BFS(
+			goal = Astar(
 						net, 
 						new AgentState(
 								new Position( // pos
@@ -67,7 +96,9 @@ public  class MyAgent extends Agent{
 								getOrientation(), // orientation
 								net, // map
 								null, // prevState
-								null // prevAction
+								null, // prevAction
+								0, // initial dist
+								dest // goal state
 							), 
 						dest
 					);
@@ -81,8 +112,12 @@ public  class MyAgent extends Agent{
 		}
 		if(!actionStack.isEmpty()){
 			String action = actionStack.pop();
-			if (action == "rotate"){
+			if (action == "rotateLEFT"){
 				turnLEFT();
+				return;
+			}
+			else if (action == "rotateRIGHT"){
+				turnRIGHT();
 				return;
 			}
 			else if (action == "forward"){

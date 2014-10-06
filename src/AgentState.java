@@ -7,16 +7,19 @@ public class AgentState {
 	Position pos;
 	int[][] map;
 	String prevAction;
-	AgentState prevState;
+	AgentState prevState; // goal state
+	Position dest;
+	int dist;
 	
 	Map<Integer, Integer> dir_r, dir_c;
 	
-	public AgentState(Position pos, int orientation, int[][] map, AgentState prevState, String prevAction){
+	public AgentState(Position pos, int orientation, int[][] map, AgentState prevState, String prevAction, int dist, Position dest){
 		this.pos = pos;
 		this.orientation = orientation;
 		this.map = map;
 		this.prevAction = prevAction;
 		this.prevState = prevState;
+		this.dest = dest;
 		
 		dir_r = new HashMap<Integer, Integer>();
 		dir_c = new HashMap<Integer, Integer>();
@@ -30,20 +33,31 @@ public class AgentState {
 		dir_c.put(World.SOUTH, 0);
 		dir_c.put(World.EAST, -1);
 		dir_c.put(World.WEST, 1);
+		
+		this.dist = dist;
 	}
 	
-	public AgentState rotate(){
-		return new AgentState(this.pos, (orientation + 1) % 4, map, this, "rotate");
+	public AgentState rotateLEFT(){
+		return new AgentState(this.pos, (orientation + 1) % 4, map, this, "rotateLEFT", this.dist + 1, this.dest);
+	}
+	
+	public AgentState rotateRIGHT(){
+		return new AgentState(this.pos, (orientation - 1 + 4) % 4, map, this, "rotateRIGHT", this.dist + 1, this.dest);
 	}
 	
 	public boolean canFW(){
-		return ((map[pos.r + dir_r.get(orientation)][pos.c + dir_c.get(orientation)] != 2) && // not a stone 
-				(map[pos.r][pos.c] != map[pos.r + dir_r.get(orientation)][pos.c + dir_c.get(orientation)])); // we can transit only between different tiles
+		return ((map[pos.r + dir_r.get(orientation)][pos.c + dir_c.get(orientation)] != 2) // not a stone 
+				); // we can transit only between different tiles
 	}
 	
 	public AgentState getFW(){
 		if (!canFW()) return null;
-		return new AgentState(new Position(pos.r + dir_r.get(orientation), pos.c + dir_c.get(orientation)), orientation, map, this, "forward");
+		return new AgentState(new Position(pos.r + dir_r.get(orientation), pos.c + dir_c.get(orientation)), orientation, map, this, "forward", this.dist + 1, this.dest);
+	}
+	
+	// returns value for comparation in heuristics
+	public int compVal(){
+		return this.dist + Math.abs(this.pos.r - dest.r) + Math.abs(this.pos.c - dest.c);
 	}
 	
 	@Override

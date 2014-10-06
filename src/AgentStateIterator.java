@@ -14,19 +14,25 @@ public class AgentStateIterator implements Iterator{
 	
 	@Override
 	public boolean hasNext() {
-		return counter < 8;
+		return counter < 3;
 	}
 
 	@Override
 	public AgentState next() {
-		AgentState ret = current;
-		if (counter++ % 2 == 1){ // on every even iteration we rotate the iterator
-			current = current.rotate();
+		
+		if (counter == 0){
+			counter++;
+			return current.getFW();
 		}
-		else{
-			ret = current.getFW(); // on every odd iteration we return the move forward
+		if (counter == 1){
+			counter++;
+			return current.rotateLEFT();
 		}
-		return ret;
+		if (counter == 2){
+			counter++;
+			return current.rotateRIGHT();
+		}
+		return null;
 	}
 
 	@Override
