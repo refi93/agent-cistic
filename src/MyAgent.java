@@ -65,7 +65,7 @@ public  class MyAgent extends Agent{
 							java.util.Iterator pqit = open.iterator(); 
 							while(pqit.hasNext()){
 								AgentState openElem = (AgentState)pqit.next();
-								if (openElem.equals(pom)){
+								if (openElem.equals(pom) && (openElem.dist > pom.dist)){
 									openElem.prevAction = pom.prevAction;
 									openElem.prevState = pom.prevState;
 									openElem.dist = pom.dist;
