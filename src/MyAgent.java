@@ -19,6 +19,9 @@ public  class MyAgent extends Agent{
 	AgentState goal = null; 
 	Deque<String> actionStack;
 	boolean firstInit;
+	GlobalPerceptMap myWorld;
+	AgentState myState;
+	
 		
 	public MyAgent(int height, int width) {
 		firstInit = true;
@@ -36,7 +39,7 @@ public  class MyAgent extends Agent{
 		}
     };
 	
-	
+	/*
 	private AgentState Astar(int[][] arr, AgentState initState, Position destination){
 		if (arr[initState.pos.r][initState.pos.c] == 2) return null;
 		
@@ -78,52 +81,50 @@ public  class MyAgent extends Agent{
 		}
 		return null;
 	}
-	
+	*/
 	
 	public void act(){			
 		/* ZACIATOK MIESTA PRE VAS KOD */
 		
 		if (firstInit){
-			net = percept();	// aktualny percept
-						// zadefinovane su konstanty CLEAN=0, DIRTY=1, WALL=2)	
-			goal = Astar(
-						net, 
-						new AgentState(
-								new Position( // pos
-										getPerceptSize(), 
-										getPerceptSize()
-									), 
-								getOrientation(), // orientation
-								net, // map
-								null, // prevState
-								null, // prevAction
-								0, // initial dist
-								dest // goal state
-							), 
-						dest
+			this.myWorld = new GlobalPerceptMap(getPerceptSize());
+			this.myState = 
+					new AgentState(
+							new Position(40, 40), // current position (global)
+							getOrientation(), // current orientation
+							myWorld, // map of World
+							null, // previous state
+							null, // previous action
+							0, // distance from start (in number of actions)
+							new Position(getPerceptSize(), getPerceptSize()) // destination - we have none
 					);
-			AgentState cur = goal;
-			while(cur.prevAction != null){
-				actionStack.push(cur.prevAction);
-				cur = cur.prevState;
-			}
-			
 			firstInit = false;
 		}
-		if(!actionStack.isEmpty()){
-			String action = actionStack.pop();
-			if (action == "rotateLEFT"){
-				turnLEFT();
-				return;
-			}
-			else if (action == "rotateRIGHT"){
-				turnRIGHT();
-				return;
-			}
-			else if (action == "forward"){
+		
+		myWorld.update(myState, percept());
+		
+		System.out.println(myWorld + "\n \n");
+		
+		Random generator = new Random();
+		int rand = generator.nextInt(3);
+		//System.out.println(rand);
+		if (rand == 0){
+			if (myState.getFW() != null){
+				myState = myState.getFW();
 				moveFW();
-				return;
+				System.out.println("AAA");
 			}
+			return;
+		}
+		else if (rand == 1){
+			myState = myState.rotateLEFT();
+			turnLEFT();
+			return;
+		}
+		else if (rand == 2){
+			myState = myState.rotateRIGHT();
+			turnRIGHT();
+			return;
 		}
 	}
 	

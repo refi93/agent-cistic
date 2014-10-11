@@ -5,7 +5,7 @@ import java.util.Map;
 public class AgentState {
 	int orientation;
 	Position pos;
-	int[][] map;
+	GlobalPerceptMap map;
 	String prevAction;
 	AgentState prevState; // goal state
 	Position dest;
@@ -13,7 +13,7 @@ public class AgentState {
 	
 	Map<Integer, Integer> dir_r, dir_c;
 	
-	public AgentState(Position pos, int orientation, int[][] map, AgentState prevState, String prevAction, int dist, Position dest){
+	public AgentState(Position pos, int orientation, GlobalPerceptMap map, AgentState prevState, String prevAction, int dist, Position dest){
 		this.pos = pos;
 		this.orientation = orientation;
 		this.map = map;
@@ -46,7 +46,7 @@ public class AgentState {
 	}
 	
 	public boolean canFW(){
-		return ((map[pos.r + dir_r.get(orientation)][pos.c + dir_c.get(orientation)] != 2) // not a stone 
+		return ((map.get()[pos.r + dir_r.get(orientation)][pos.c + dir_c.get(orientation)] != 2) // not a stone 
 				); // we can transit only between different tiles
 	}
 	
