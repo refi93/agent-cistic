@@ -46,7 +46,7 @@ public class AgentState {
 	}
 	
 	public boolean canFW(){
-		return ((map.get()[pos.r + dir_r.get(orientation)][pos.c + dir_c.get(orientation)] != 2) // not a stone 
+		return ((map.getMap()[pos.r + dir_r.get(orientation)][pos.c + dir_c.get(orientation)] != 2) // not a stone 
 				); // we can transit only between different tiles
 	}
 	

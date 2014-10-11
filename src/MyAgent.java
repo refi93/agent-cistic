@@ -13,10 +13,6 @@ import java.util.*;
 import javax.swing.text.html.HTMLDocument.Iterator;
 
 public  class MyAgent extends Agent{	
-	int[][] net;
-	
-	Position dest;
-	AgentState goal = null; 
 	Deque<String> actionStack;
 	boolean firstInit;
 	GlobalPerceptMap myWorld;
@@ -25,7 +21,6 @@ public  class MyAgent extends Agent{
 		
 	public MyAgent(int height, int width) {
 		firstInit = true;
-		dest = new Position(10,7);
 		actionStack = new ArrayDeque<String>();
 	}
 	
@@ -39,9 +34,9 @@ public  class MyAgent extends Agent{
 		}
     };
 	
-	/*
-	private AgentState Astar(int[][] arr, AgentState initState, Position destination){
-		if (arr[initState.pos.r][initState.pos.c] == 2) return null;
+	
+	private AgentState Astar(GlobalPerceptMap myWorld, AgentState initState){
+		if (myWorld.getMap()[initState.pos.r][initState.pos.c] == 2) return null;
 		
 		Queue open = new PriorityQueue<AgentState>(1000, agentStateComparator);
 		open.add(initState); // states to visit
@@ -51,8 +46,13 @@ public  class MyAgent extends Agent{
 		
 		while (!open.isEmpty()){
 			AgentState curState = (AgentState) open.remove();
-			if (curState.pos.equals(destination)) {
+			if (curState.pos.equals(curState.dest)) {
 				return curState;
+			}
+			else if (curState.dest.equals(new Position(-1, -1))){ // so we don't have specific destination
+				if (!myWorld.getVisited()[curState.pos.r][curState.pos.c]){ // if we are on not visited position, return path to it
+					return curState;
+				}
 			}
 			
 			if (!close.contains(curState)){
@@ -81,51 +81,79 @@ public  class MyAgent extends Agent{
 		}
 		return null;
 	}
-	*/
 	
+    
 	public void act(){			
 		/* ZACIATOK MIESTA PRE VAS KOD */
 		
+		int[][] net = percept();
+		
+		
 		if (firstInit){
 			this.myWorld = new GlobalPerceptMap(getPerceptSize());
+			
 			this.myState = 
 					new AgentState(
-							new Position(40, 40), // current position (global)
+							new Position(Constants.WORLD_MAX_SIZE, Constants.WORLD_MAX_SIZE), // current position (global)
 							getOrientation(), // current orientation
 							myWorld, // map of World
 							null, // previous state
 							null, // previous action
 							0, // distance from start (in number of actions)
-							new Position(getPerceptSize(), getPerceptSize()) // destination - we have none
+							new Position(-1, -1) // destination - we have none
 					);
 			firstInit = false;
 		}
 		
-		myWorld.update(myState, percept());
+		//update world with the current perception
+		myWorld.update(myState, net);
 		
-		System.out.println(myWorld + "\n \n");
 		
-		Random generator = new Random();
-		int rand = generator.nextInt(3);
-		//System.out.println(rand);
-		if (rand == 0){
-			if (myState.getFW() != null){
-				myState = myState.getFW();
-				moveFW();
-				System.out.println("AAA");
+		if (myWorld.getMap()[myState.pos.r][myState.pos.c] == World.DIRTY){
+			suck();
+			return;
+		}
+		else if (actionStack.isEmpty()){
+			// reset myState previous actions
+			myState.prevAction = null;
+			myState.prevState = null;
+			
+			AgentState goal = Astar(
+					myWorld, 
+					myState
+				);
+			AgentState cur = goal;
+			
+			if (cur == null){
+				halt(); // we have no position to visit
+				return;
 			}
-			return;
+			
+			while(cur.prevAction != null){
+				actionStack.push(cur.prevAction);
+				cur = cur.prevState;
+			}
 		}
-		else if (rand == 1){
-			myState = myState.rotateLEFT();
-			turnLEFT();
-			return;
+		else{
+			String action = actionStack.pop();
+			if (action == "rotateLEFT"){
+				turnLEFT();
+				myState = myState.rotateLEFT();
+				return;
+			}
+			else if (action == "rotateRIGHT"){
+				turnRIGHT();
+				myState = myState.rotateRIGHT();
+				return;
+			}
+			else if (action == "forward"){
+				moveFW();
+				myState = myState.getFW();
+				return;
+			}
 		}
-		else if (rand == 2){
-			myState = myState.rotateRIGHT();
-			turnRIGHT();
-			return;
-		}
+		
+		
 	}
 	
 }
