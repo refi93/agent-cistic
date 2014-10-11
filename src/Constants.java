@@ -1,4 +1,4 @@
 
 public class Constants {
-	static int WORLD_MAX_SIZE = 40;
+	static int WORLD_MAX_SIZE = 210;
 }

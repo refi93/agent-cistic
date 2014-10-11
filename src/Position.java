@@ -18,6 +18,10 @@ public class Position {
   }
   
   public int hashCode(){
-	  return 0;
+	  final int prime = 31;
+	  int result = 1;
+	  result = prime * result + (int) (this.r ^ (this.r >>> 32));
+	  result = prime * result + (int) (this.c ^ (this.c >>> 32));
+      return result;
   }
 } 

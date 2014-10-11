@@ -69,6 +69,10 @@ public class AgentState {
 	  }
 	  
 	  public int hashCode(){
-		  return 0;
+		  final int prime = 31;
+		  int result = 1;
+		  result = prime * result + (int) (this.pos.hashCode() ^ (this.pos.hashCode() >>> 32));
+		  result = prime * result + (int) (this.orientation ^ (this.orientation >>> 32));
+		  return result;
 	  }
 }

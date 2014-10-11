@@ -50,6 +50,7 @@ public  class MyAgent extends Agent{
 				return curState;
 			}
 			else if (curState.dest.equals(new Position(-1, -1))){ // so we don't have specific destination
+				// we return path to cca furthest point we can get
 				if (!myWorld.getVisited()[curState.pos.r][curState.pos.c]){ // if we are on not visited position, return path to it
 					return curState;
 				}
