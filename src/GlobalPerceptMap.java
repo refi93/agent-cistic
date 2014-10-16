@@ -42,11 +42,21 @@ public class GlobalPerceptMap {
 		}
 	}
 	
-	public String toString(){
+	public String toString(AgentState curState){
 		StringBuilder ret = new StringBuilder();
 		for (int i = 0;i < Constants.WORLD_MAX_SIZE * 2; i++){
 			for (int j = 0; j < Constants.WORLD_MAX_SIZE * 2; j++){
-				if (map[i][j] == 0){
+				
+				if (curState.pos.r == i && curState.pos.c == j){
+					if (map[i][j] == 0)
+						ret.append("@");
+					else if (map[i][j] == 1)
+						ret.append("#");
+					else{
+						ret.append("$");
+					}
+				}
+				else if (map[i][j] == 0){
 					ret.append('0');
 				}
 				else if (map[i][j] == 1){

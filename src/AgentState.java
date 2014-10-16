@@ -31,23 +31,22 @@ public class AgentState {
 		
 		dir_c.put(World.NORTH, 0);
 		dir_c.put(World.SOUTH, 0);
-		dir_c.put(World.EAST, -1);
-		dir_c.put(World.WEST, 1);
+		dir_c.put(World.EAST, 1);
+		dir_c.put(World.WEST, -1);
 		
 		this.dist = dist;
 	}
 	
 	public AgentState rotateLEFT(){
-		return new AgentState(this.pos, (orientation + 1) % 4, map, this, "rotateLEFT", this.dist + 1, this.dest);
+		return new AgentState(this.pos, (orientation - 1 + 4) % 4, map, this, "rotateLEFT", this.dist + 1, this.dest);
 	}
 	
 	public AgentState rotateRIGHT(){
-		return new AgentState(this.pos, (orientation - 1 + 4) % 4, map, this, "rotateRIGHT", this.dist + 1, this.dest);
+		return new AgentState(this.pos, (orientation + 1) % 4, map, this, "rotateRIGHT", this.dist + 1, this.dest);
 	}
 	
 	public boolean canFW(){
-		return ((map.getMap()[pos.r + dir_r.get(orientation)][pos.c + dir_c.get(orientation)] != 2) // not a stone 
-				); // we can transit only between different tiles
+		return ((map.getMap()[pos.r + dir_r.get(orientation)][pos.c + dir_c.get(orientation)] != 2));
 	}
 	
 	public AgentState getFW(){

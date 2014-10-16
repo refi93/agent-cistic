@@ -29,8 +29,7 @@ public class World {
 	public static final String SUCK = "SUCK";
 	
 	
-	
-	public static Random r = new Random(new Date().getTime());
+	public static Random r = new Random(new Date().getTime()); //1413372030355l
 	
 	private long WAIT = 1000;
 	private int PERCEPTION = 0; 

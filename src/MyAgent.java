@@ -50,7 +50,6 @@ public  class MyAgent extends Agent{
 				return curState;
 			}
 			else if (curState.dest.equals(new Position(-1, -1))){ // so we don't have specific destination
-				// we return path to cca furthest point we can get
 				if (!myWorld.getVisited()[curState.pos.r][curState.pos.c]){ // if we are on not visited position, return path to it
 					return curState;
 				}
@@ -66,7 +65,7 @@ public  class MyAgent extends Agent{
 							open.add(pom);
 						}
 						else{
-							java.util.Iterator pqit = open.iterator(); 
+							/*java.util.Iterator pqit = open.iterator(); 
 							while(pqit.hasNext()){
 								AgentState openElem = (AgentState)pqit.next();
 								if (openElem.equals(pom) && (openElem.dist > pom.dist)){
@@ -74,7 +73,7 @@ public  class MyAgent extends Agent{
 									openElem.prevState = pom.prevState;
 									openElem.dist = pom.dist;
 								}
-							}
+							}*/
 						}
 					}
 				}
@@ -114,7 +113,7 @@ public  class MyAgent extends Agent{
 			suck();
 			return;
 		}
-		else if (actionStack.isEmpty()){
+		else if (actionStack.size() == 0){
 			// reset myState previous actions
 			myState.prevAction = null;
 			myState.prevState = null;
@@ -124,6 +123,7 @@ public  class MyAgent extends Agent{
 					myState
 				);
 			AgentState cur = goal;
+			
 			
 			if (cur == null){
 				halt(); // we have no position to visit
