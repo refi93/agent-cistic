@@ -33,12 +33,15 @@ public  class MyAgent extends Agent{
 			return (int) (s0.compVal() - s1.compVal());
 		}
     };
+    
 	
-	
-	private AgentState Astar(GlobalPerceptMap myWorld, AgentState initState){
+    // find nearest dirty / unknown using BFS
+	private AgentState BFS(GlobalPerceptMap myWorld, AgentState initState, int target_type){
 		if (myWorld.getMap()[initState.pos.r][initState.pos.c] == 2) return null;
 		
-		Queue open = new PriorityQueue<AgentState>(1000, agentStateComparator);
+		
+		
+		Queue open = new LinkedList<AgentState>();
 		open.add(initState); // states to visit
 		
 		Set<AgentState> close = new HashSet<AgentState >(); // visited states
@@ -50,31 +53,26 @@ public  class MyAgent extends Agent{
 				return curState;
 			}
 			else if (curState.dest.equals(new Position(-1, -1))){ // so we don't have specific destination
-				if (!myWorld.getVisited()[curState.pos.r][curState.pos.c]){ // if we are on not visited position, return path to it
-					return curState;
+				int tile = myWorld.getMap()[curState.pos.r][curState.pos.c];
+				if (tile == target_type){
+					if (target_type == World.DIRTY){
+						return curState;
+					}
+					if (target_type == Constants.UNKNOWN){ // if we are on not visited position, return path to it
+						return curState.prevState; // aby sme nahodou chudaka neposlali do steny
+					}
 				}
 			}
 			
-			if (!close.contains(curState)){
+			
+			// nechceme rozvijat unknown policka dalej
+			if (!close.contains(curState) && (myWorld.getMap()[curState.pos.r][curState.pos.c] != Constants.UNKNOWN)){
 				close.add(curState);
 				AgentStateIterator it = new AgentStateIterator(curState);
 				while(it.hasNext()){
 					AgentState pom = it.next();
 					if ((pom != null) && (!close.contains(pom))){
-						if (!open.contains(pom)){
-							open.add(pom);
-						}
-						else{
-							/*java.util.Iterator pqit = open.iterator(); 
-							while(pqit.hasNext()){
-								AgentState openElem = (AgentState)pqit.next();
-								if (openElem.equals(pom) && (openElem.dist > pom.dist)){
-									openElem.prevAction = pom.prevAction;
-									openElem.prevState = pom.prevState;
-									openElem.dist = pom.dist;
-								}
-							}*/
-						}
+						open.add(pom);
 					}
 				}
 			}
@@ -108,7 +106,6 @@ public  class MyAgent extends Agent{
 		//update world with the current perception
 		myWorld.update(myState, net);
 		
-		
 		if (myWorld.getMap()[myState.pos.r][myState.pos.c] == World.DIRTY){
 			suck();
 			return;
@@ -118,10 +115,27 @@ public  class MyAgent extends Agent{
 			myState.prevAction = null;
 			myState.prevState = null;
 			
-			AgentState goal = Astar(
+			
+			
+			AgentState goal = null;
+			if (myWorld.dirtCount > 0){
+				goal = BFS(
 					myWorld, 
-					myState
+					myState,
+					World.DIRTY
 				);
+			}
+			
+			// ak sme nenasli spinu, ideme rozvijat unknown policka
+			if (goal == null){
+				goal = BFS(
+						myWorld, 
+						myState,
+						Constants.UNKNOWN
+					);
+			}
+			
+			
 			AgentState cur = goal;
 			
 			

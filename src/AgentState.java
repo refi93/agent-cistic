@@ -46,7 +46,8 @@ public class AgentState {
 	}
 	
 	public boolean canFW(){
-		return ((map.getMap()[pos.r + dir_r.get(orientation)][pos.c + dir_c.get(orientation)] != 2));
+		int tile = map.getMap()[pos.r + dir_r.get(orientation)][pos.c + dir_c.get(orientation)];
+		return (tile != World.WALL);
 	}
 	
 	public AgentState getFW(){
