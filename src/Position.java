@@ -17,11 +17,12 @@ public class Position {
    return ((p.r == this.r) && (p.c == this.c));
   }
   
+  @Override
   public int hashCode(){
-	  final int prime = 31;
+	  int prime = 47;
 	  int result = 1;
-	  result = prime * result + (int) (this.r ^ (this.r >>> 32));
-	  result = prime * result + (int) (this.c ^ (this.c >>> 32));
+	  result = prime * result + this.r;
+	  result = prime * result + this.c;
       return result;
   }
 } 

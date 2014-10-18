@@ -61,18 +61,19 @@ public class AgentState {
 	}
 	
 	@Override
-	  public boolean equals(Object obj) {
-	   if(this==obj)
-	    return true;
-	   AgentState s = (AgentState)obj;
-	   return ((s.pos.equals(this.pos)) && (s.orientation == this.orientation));
-	  }
-	  
-	  public int hashCode(){
-		  final int prime = 31;
-		  int result = 1;
-		  result = prime * result + (int) (this.pos.hashCode() ^ (this.pos.hashCode() >>> 32));
-		  result = prime * result + (int) (this.orientation ^ (this.orientation >>> 32));
-		  return result;
-	  }
+	public boolean equals(Object obj) {
+		if(this==obj)
+			return true;
+		AgentState s = (AgentState)obj;
+		return ((s.pos.equals(this.pos)) && (s.orientation == this.orientation));
+	}
+	 
+	@Override
+	public int hashCode(){
+		final int prime = 47;
+		int result = 1;
+		result = prime * result + this.pos.hashCode();
+		result = prime * result + this.orientation;
+		return result;
+	}
 }

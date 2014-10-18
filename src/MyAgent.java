@@ -36,37 +36,36 @@ public  class MyAgent extends Agent{
     
 	
     // find nearest dirty / unknown using BFS
-	private AgentState BFS(GlobalPerceptMap myWorld, AgentState initState, int target_type){
-		if (myWorld.getMap()[initState.pos.r][initState.pos.c] == 2) return null;
+	private AgentState BFS(GlobalPerceptMap myWorld, AgentState initState){
+		initState.dist = 0;
+		if (myWorld.getMap()[initState.pos.r][initState.pos.c] == World.WALL) return null;
 		
 		
 		
 		Queue open = new LinkedList<AgentState>();
 		open.add(initState); // states to visit
 		
-		Set<AgentState> close = new HashSet<AgentState >(); // visited states
+		Set<AgentState> close = new HashSet<AgentState>(); // visited states
 		
-		
+		int counter = 0;
 		while (!open.isEmpty()){
 			AgentState curState = (AgentState) open.remove();
+			int curTile = myWorld.getMap()[curState.pos.r][curState.pos.c];
 			if (curState.pos.equals(curState.dest)) {
 				return curState;
 			}
 			else if (curState.dest.equals(new Position(-1, -1))){ // so we don't have specific destination
-				int tile = myWorld.getMap()[curState.pos.r][curState.pos.c];
-				if (tile == target_type){
-					if (target_type == World.DIRTY){
-						return curState;
-					}
-					if (target_type == Constants.UNKNOWN){ // if we are on not visited position, return path to it
-						return curState.prevState; // aby sme nahodou chudaka neposlali do steny
-					}
+				if (curTile == World.DIRTY){
+					return curState;
+				}
+				if (curTile == Constants.UNKNOWN){ // if we are on not visited position, return path to it
+					return curState.prevState; // aby sme nahodou chudaka neposlali do steny
 				}
 			}
 			
 			
 			// nechceme rozvijat unknown policka dalej
-			if (!close.contains(curState) && (myWorld.getMap()[curState.pos.r][curState.pos.c] != Constants.UNKNOWN)){
+			if ((curTile != Constants.UNKNOWN) && !close.contains(curState)){
 				close.add(curState);
 				AgentStateIterator it = new AgentStateIterator(curState);
 				while(it.hasNext()){
@@ -118,22 +117,11 @@ public  class MyAgent extends Agent{
 			
 			
 			AgentState goal = null;
-			if (myWorld.dirtCount > 0){
-				goal = BFS(
-					myWorld, 
-					myState,
-					World.DIRTY
-				);
-			}
 			
-			// ak sme nenasli spinu, ideme rozvijat unknown policka
-			if (goal == null){
-				goal = BFS(
-						myWorld, 
-						myState,
-						Constants.UNKNOWN
-					);
-			}
+			goal = BFS(
+				myWorld, 
+				myState
+			);
 			
 			
 			AgentState cur = goal;
